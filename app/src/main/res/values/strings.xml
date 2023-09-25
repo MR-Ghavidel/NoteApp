@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">NoteApp</string>
+    <string name="notes_title">یادداشت ها</string>
+    <string name="note_topic">موضوع</string>
+    <string name="note_description">متن یادداشت</string>
+    <string name="save_note">ذخیره یادداشت</string>
+    <string name="delete_all_notes">حذف تمام یادداشت ها</string>
+    <string name="are_you_sure">از این کار اطمینان دارید؟</string>
+    <string name="cancel">لغو</string>
+    <string name="delete_confirm_timer">حذف(%1$s)</string>
+    <string name="delete_confirm">حذف</string>
+    <string name="note_description_preview">متن: %1$s</string>
+    <string name="delete_note">حذف یادداشت</string>
+    <string name="edit">ویرایش</string>
+    <string name="liked_notes">لایک شده ها</string>
+</resources>
