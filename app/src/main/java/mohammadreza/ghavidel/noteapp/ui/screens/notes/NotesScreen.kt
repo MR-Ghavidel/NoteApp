@@ -1,5 +1,6 @@
 package mohammadreza.ghavidel.noteapp.ui.screens.notes
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -277,6 +278,11 @@ fun NotesScreen(
                     ) { itEditDialog ->
                         isShowNoteDialog = itEditDialog
                     }
+                }
+            }
+            BackHandler(enabled = bottomSheetState.isVisible) {
+                scope.launch {
+                    bottomSheetState.hide()
                 }
             }
         }
