@@ -46,6 +46,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mohammadreza.ghavidel.noteapp.R
 import mohammadreza.ghavidel.noteapp.database.notes.NoteEntity
+import mohammadreza.ghavidel.noteapp.ui.common.deleteDialogTimer
 import mohammadreza.ghavidel.noteapp.ui.theme.red
 
 
@@ -264,28 +265,36 @@ fun DeleteNoteDialog(
             action(false)
         },
         title = {
-            Text(
-                text = stringResource(R.string.delete_note),
-                style = MaterialTheme.typography.h2,
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(R.string.delete_note),
+                    style = MaterialTheme.typography.h2,
+                )
+            }
         },
         text = {
-            Text(
-                text = stringResource(R.string.are_you_sure),
-                style = MaterialTheme.typography.h2,
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(R.string.are_you_sure),
+                    style = MaterialTheme.typography.h2,
+                )
+            }
         },
         buttons = {
-            var timer by remember { mutableStateOf(3) }
-            var isClickable by remember { mutableStateOf(false) }
+            //var timer by remember { mutableStateOf(3) }
+            //val isClickable by remember { mutableStateOf(false) }
 
-            LaunchedEffect(Unit) {
+            /*LaunchedEffect(Unit) {
                 while (timer > 0) {
                     delay(1000)
                     timer -= 1
                 }
                 isClickable = true
-            }
+            }*/
             Row(
                 modifier = Modifier.padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -304,7 +313,7 @@ fun DeleteNoteDialog(
                     )
                 }
                 Button(
-                    enabled = isClickable,
+                    //enabled = isClickable,
                     onClick = {
                         viewModel.deleteNote(note)
                         isDialog = false
@@ -312,7 +321,7 @@ fun DeleteNoteDialog(
                     },
                     modifier = Modifier.weight(1f)
                 ) {
-                    if (timer > 0) {
+                    /*if (timer > 0) {
                         Text(
                             text = stringResource(
                                 R.string.delete_confirm_timer,
@@ -320,14 +329,106 @@ fun DeleteNoteDialog(
                             ),
                             style = MaterialTheme.typography.button
                         )
-                    } else {
-                        Text(
-                            text = stringResource(R.string.delete_confirm),
-                            style = MaterialTheme.typography.button
-                        )
-                    }
+                    } else {*/
+                    Text(
+                        text = stringResource(R.string.delete_confirm),
+                        style = MaterialTheme.typography.button
+                    )
+                    //}
                 }
             }
         }
     )
+}
+
+
+@Composable
+fun DeleteAllNotesDialog(
+    isDeleteAllDialog: Boolean,
+    viewModel: NoteScreenViewModel,
+    action: (Boolean) -> Unit
+) {
+    var isDeleteAllDialog1 = isDeleteAllDialog
+    if (isDeleteAllDialog1) {
+        AlertDialog(
+            onDismissRequest = {
+                isDeleteAllDialog1 = false
+                action(false)
+            },
+            title = {
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(R.string.delete_all_notes),
+                        style = MaterialTheme.typography.h2,
+                    )
+                }
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(R.string.are_you_sure),
+                        style = MaterialTheme.typography.h2,
+                    )
+                }
+            },
+            buttons = {
+                var timer by remember { mutableStateOf(deleteDialogTimer) }
+                var isClickable by remember { mutableStateOf(false) }
+
+                LaunchedEffect(Unit) {
+                    while (timer > 0) {
+                        delay(1000)
+                        timer -= 1
+                    }
+                    isClickable = true
+                }
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            isDeleteAllDialog1 = false
+                            action(false)
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.cancel),
+                            style = MaterialTheme.typography.button
+                        )
+                    }
+                    Button(
+                        enabled = isClickable,
+                        onClick = {
+                            viewModel.deleteAllNotes()
+                            isDeleteAllDialog1 = false
+                            action(false)
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        if (timer > 0) {
+                            Text(
+                                text = stringResource(
+                                    R.string.delete_confirm_timer,
+                                    timer
+                                ),
+                                style = MaterialTheme.typography.button
+                            )
+                        } else {
+                            Text(
+                                text = stringResource(R.string.delete_confirm),
+                                style = MaterialTheme.typography.button
+                            )
+                        }
+                    }
+                }
+            }
+        )
+    }
 }

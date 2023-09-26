@@ -17,8 +17,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
@@ -41,7 +39,6 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,7 +54,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mohammadreza.ghavidel.noteapp.R
 
@@ -160,74 +156,8 @@ fun NotesScreen(
                                 )
                             }
                         }
-                        if (isDeleteAllDialog) {
-                            AlertDialog(
-                                onDismissRequest = { isDeleteAllDialog = false },
-                                title = {
-                                    Text(
-                                        text = stringResource(R.string.delete_all_notes),
-                                        style = MaterialTheme.typography.h2,
-                                    )
-                                },
-                                text = {
-                                    Text(
-                                        text = stringResource(R.string.are_you_sure),
-                                        style = MaterialTheme.typography.h2,
-                                    )
-                                },
-                                buttons = {
-                                    var timer by remember { mutableStateOf(5) }
-                                    var isClickable by remember { mutableStateOf(false) }
-
-                                    LaunchedEffect(Unit) {
-                                        while (timer > 0) {
-                                            delay(1000)
-                                            timer -= 1
-                                        }
-                                        isClickable = true
-                                    }
-                                    Row(
-                                        modifier = Modifier.padding(16.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                                    ) {
-                                        Button(
-                                            onClick = {
-                                                isDeleteAllDialog = false
-                                            },
-                                            modifier = Modifier.weight(1f)
-                                        ) {
-                                            Text(
-                                                text = stringResource(R.string.cancel),
-                                                style = MaterialTheme.typography.button
-                                            )
-                                        }
-                                        Button(
-                                            enabled = isClickable,
-                                            onClick = {
-                                                viewModel.deleteAllNotes()
-                                                isDeleteAllDialog = false
-                                            },
-                                            modifier = Modifier.weight(1f)
-                                        ) {
-                                            if (timer > 0) {
-                                                Text(
-                                                    text = stringResource(
-                                                        R.string.delete_confirm_timer,
-                                                        timer
-                                                    ),
-                                                    style = MaterialTheme.typography.button
-                                                )
-                                            } else {
-                                                Text(
-                                                    text = stringResource(R.string.delete_confirm),
-                                                    style = MaterialTheme.typography.button
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            )
+                        DeleteAllNotesDialog(isDeleteAllDialog, viewModel) { itDialog ->
+                            isDeleteAllDialog = itDialog
                         }
                     },
                     backgroundColor = MaterialTheme.colors.background
@@ -344,7 +274,7 @@ fun NotesScreen(
                         scaffoldState,
                         clipboardManager,
                         context
-                    ){itEditDialog->
+                    ) { itEditDialog ->
                         isShowNoteDialog = itEditDialog
                     }
                 }
@@ -352,5 +282,3 @@ fun NotesScreen(
         }
     }
 }
-
-
