@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,9 +57,9 @@ fun EditOrShowDialog(
 ) {
     var isShowNoteDialog1 = isShowNoteDialog
     if (isShowNoteDialog1) {
-        var checkedEdit by remember { mutableStateOf(false) }
-        var topicValue by remember { mutableStateOf(note.topic) }
-        var descriptionValue by remember { mutableStateOf(note.description) }
+        var checkedEdit by rememberSaveable { mutableStateOf(false) }
+        var topicValue by rememberSaveable { mutableStateOf(note.topic) }
+        var descriptionValue by rememberSaveable { mutableStateOf(note.description) }
         val clipboardManager = LocalClipboardManager.current
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
@@ -182,7 +183,6 @@ fun EditOrShowDialog(
                                 )
                             }
                         },
-                        //enabled = checkedEdit,
                         readOnly = !checkedEdit,
                         singleLine = true,
                         colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -219,7 +219,6 @@ fun EditOrShowDialog(
                                 )
                             }
                         },
-                        //enabled = checkedEdit,
                         readOnly = !checkedEdit,
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             focusedBorderColor = MaterialTheme.colors.primaryVariant,
@@ -267,16 +266,6 @@ fun DeleteNoteDialog(
             }
         },
         buttons = {
-            //var timer by remember { mutableStateOf(3) }
-            //val isClickable by remember { mutableStateOf(false) }
-
-            /*LaunchedEffect(Unit) {
-                while (timer > 0) {
-                    delay(1000)
-                    timer -= 1
-                }
-                isClickable = true
-            }*/
             Row(
                 modifier = Modifier.padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -303,20 +292,10 @@ fun DeleteNoteDialog(
                     },
                     modifier = Modifier.weight(1f)
                 ) {
-                    /*if (timer > 0) {
-                        Text(
-                            text = stringResource(
-                                R.string.delete_confirm_timer,
-                                timer
-                            ),
-                            style = MaterialTheme.typography.button
-                        )
-                    } else {*/
                     Text(
                         text = stringResource(R.string.delete_confirm),
                         style = MaterialTheme.typography.button
                     )
-                    //}
                 }
             }
         }
@@ -358,7 +337,7 @@ fun DeleteAllNotesDialog(
                 }
             },
             buttons = {
-                var timer by remember { mutableStateOf(deleteDialogTimer) }
+                var timer by rememberSaveable { mutableStateOf(deleteDialogTimer) }
                 var isClickable by remember { mutableStateOf(false) }
 
                 LaunchedEffect(Unit) {

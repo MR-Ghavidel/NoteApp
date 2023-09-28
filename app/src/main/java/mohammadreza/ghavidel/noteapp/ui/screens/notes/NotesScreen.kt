@@ -49,6 +49,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,9 +70,9 @@ fun NotesScreen(
     val scaffoldState = rememberScaffoldState()
     val notes by viewModel.notes.collectAsState()
     val bookmarkNotes by viewModel.bookmarkNotes.collectAsState()
-    var expanded by remember { mutableStateOf(false) }
-    var isDeleteAllDialog by remember { mutableStateOf(false) }
-    var bookmarkFilter by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    var isDeleteAllDialog by rememberSaveable { mutableStateOf(false) }
+    var bookmarkFilter by rememberSaveable { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true
@@ -213,14 +214,14 @@ fun NotesScreen(
                 items(
                     if (bookmarkFilter) bookmarkNotes else notes
                 ) { note ->
-                    var isShowNoteDialog by remember { mutableStateOf(false) }
+                    var isShowOrEditDialog by rememberSaveable { mutableStateOf(false) }
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(MaterialTheme.shapes.medium)
                             .border(1.dp, MaterialTheme.colors.primary, MaterialTheme.shapes.medium)
                             .height(150.dp)
-                            .clickable { isShowNoteDialog = true },
+                            .clickable { isShowOrEditDialog = true },
                         contentPadding = PaddingValues(
                             vertical = 8.dp,
                             horizontal = 8.dp
@@ -254,7 +255,7 @@ fun NotesScreen(
                                         .weight(1f)
                                         .padding(start = 4.dp)
                                 )
-                                var isDeleteNoteDialog by remember { mutableStateOf(false) }
+                                var isDeleteNoteDialog by rememberSaveable { mutableStateOf(false) }
 
                                 Icon(
                                     imageVector = Icons.Outlined.Delete,
@@ -286,11 +287,11 @@ fun NotesScreen(
                         }
                     }
                     EditOrShowDialog(
-                        isShowNoteDialog = isShowNoteDialog,
+                        isShowNoteDialog = isShowOrEditDialog,
                         note = note,
                         scaffoldState = scaffoldState,
                     ) { itEditDialog ->
-                        isShowNoteDialog = itEditDialog
+                        isShowOrEditDialog = itEditDialog
                     }
                 }
             }

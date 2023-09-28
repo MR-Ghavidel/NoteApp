@@ -20,7 +20,6 @@ import androidx.compose.material.icons.outlined.Create
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -44,7 +43,7 @@ fun SheetContent(
     scaffoldState: ScaffoldState
 ) {
     var topicText by rememberSaveable { mutableStateOf("") }
-    var isTopicError by remember { mutableStateOf(false) }
+    var isTopicError by rememberSaveable { mutableStateOf(false) }
     var descriptionText by rememberSaveable { mutableStateOf("") }
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
