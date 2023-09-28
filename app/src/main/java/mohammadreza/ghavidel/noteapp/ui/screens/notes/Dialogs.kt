@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -47,9 +48,9 @@ import mohammadreza.ghavidel.noteapp.ui.theme.red
 
 @Composable
 fun EditOrShowDialog(
+    viewModel: NoteScreenViewModel = hiltViewModel(),
     isShowNoteDialog: Boolean,
     note: NoteEntity,
-    viewModel: NoteScreenViewModel = hiltViewModel(),
     scaffoldState: ScaffoldState,
     action: (Boolean) -> Unit
 ) {
@@ -89,6 +90,9 @@ fun EditOrShowDialog(
                                 )
                             }
                         },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = red
+                        ),
                         modifier = Modifier
                             .weight(1f)
                             .padding(start = 16.dp, bottom = 16.dp)
@@ -96,7 +100,7 @@ fun EditOrShowDialog(
                         Text(
                             text = "ذخیره و بستن",
                             style = MaterialTheme.typography.button,
-                            color = if (enabled) red else Color.LightGray
+                            color = if (enabled) MaterialTheme.colors.background else Color.LightGray
                         )
                     }
                     Button(
@@ -322,8 +326,8 @@ fun DeleteNoteDialog(
 
 @Composable
 fun DeleteAllNotesDialog(
-    isDeleteAllDialog: Boolean,
     viewModel: NoteScreenViewModel = hiltViewModel(),
+    isDeleteAllDialog: Boolean,
     action: (Boolean) -> Unit
 ) {
     var isDeleteAllDialog1 = isDeleteAllDialog

@@ -89,7 +89,6 @@ fun NotesScreen(
         sheetContent = {
             SheetContent(
                 bottomSheetState = bottomSheetState,
-                scope = scope,
                 scaffoldState = scaffoldState,
             )
         },
@@ -160,7 +159,7 @@ fun NotesScreen(
                                 )
                             }
                         }
-                        DeleteAllNotesDialog(isDeleteAllDialog) { itDialog ->
+                        DeleteAllNotesDialog(isDeleteAllDialog = isDeleteAllDialog) { itDialog ->
                             isDeleteAllDialog = itDialog
                         }
                     },

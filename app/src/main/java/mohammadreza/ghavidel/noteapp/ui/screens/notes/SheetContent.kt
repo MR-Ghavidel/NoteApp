@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -29,7 +30,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mohammadreza.ghavidel.noteapp.R
@@ -39,15 +39,15 @@ import mohammadreza.ghavidel.noteapp.database.notes.NoteEntity
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SheetContent(
+    viewModel: NoteScreenViewModel = hiltViewModel(),
     bottomSheetState: ModalBottomSheetState,
-    scope: CoroutineScope,
-    scaffoldState: ScaffoldState,
-    viewModel: NoteScreenViewModel = hiltViewModel()
+    scaffoldState: ScaffoldState
 ) {
     var topicText by rememberSaveable { mutableStateOf("") }
     var isTopicError by remember { mutableStateOf(false) }
     var descriptionText by rememberSaveable { mutableStateOf("") }
     val scrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
 
     Column(
