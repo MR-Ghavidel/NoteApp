@@ -1,17 +1,13 @@
 package mohammadreza.ghavidel.noteapp.ui.screens.notes
 
-import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
@@ -19,28 +15,28 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mohammadreza.ghavidel.noteapp.R
@@ -53,11 +49,8 @@ import mohammadreza.ghavidel.noteapp.ui.theme.red
 fun EditOrShowDialog(
     isShowNoteDialog: Boolean,
     note: NoteEntity,
-    viewModel: NoteScreenViewModel,
-    scope: CoroutineScope,
+    viewModel: NoteScreenViewModel = hiltViewModel(),
     scaffoldState: ScaffoldState,
-    clipboardManager: ClipboardManager,
-    context: Context,
     action: (Boolean) -> Unit
 ) {
     var isShowNoteDialog1 = isShowNoteDialog
@@ -65,6 +58,11 @@ fun EditOrShowDialog(
         var checkedEdit by remember { mutableStateOf(false) }
         var topicValue by remember { mutableStateOf(note.topic) }
         var descriptionValue by remember { mutableStateOf(note.description) }
+        val clipboardManager = LocalClipboardManager.current
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+        val enabled =
+            (topicValue != note.topic || descriptionValue != note.description) && topicValue.isNotEmpty()
 
         AlertDialog(
             onDismissRequest = { },
@@ -74,7 +72,7 @@ fun EditOrShowDialog(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Button(
-                        enabled = (topicValue != note.topic || descriptionValue != note.description) && topicValue.isNotEmpty(),
+                        enabled = enabled,
                         onClick = {
                             isShowNoteDialog1 = false
                             action(false)
@@ -90,7 +88,6 @@ fun EditOrShowDialog(
                                     actionLabel = "ویرایش"
                                 )
                             }
-
                         },
                         modifier = Modifier
                             .weight(1f)
@@ -99,7 +96,7 @@ fun EditOrShowDialog(
                         Text(
                             text = "ذخیره و بستن",
                             style = MaterialTheme.typography.button,
-                            color = red
+                            color = if (enabled) red else Color.LightGray
                         )
                     }
                     Button(
@@ -119,141 +116,123 @@ fun EditOrShowDialog(
                 }
             },
             text = {
-                Scaffold(
-                    modifier = Modifier.heightIn(max = 300.dp),
-                    topBar = {
-                        TopAppBar(
-                            title = {
-                                Text(
-                                    text = "مشاهده یا ویرایش",
-                                    style = MaterialTheme.typography.h2,
-                                )
-                            },
-                            actions = {
-                                Switch(
-                                    checked = checkedEdit,
-                                    onCheckedChange = { switch ->
-                                        checkedEdit = switch
-                                    },
-                                    colors = SwitchDefaults.colors(MaterialTheme.colors.primaryVariant)
-                                )
-                                val textColor = if (checkedEdit) red else Color.Gray
-                                Text(
-                                    text = stringResource(R.string.edit),
-                                    style = MaterialTheme.typography.body2,
-                                    color = textColor
-                                )
-                            },
-                            backgroundColor = MaterialTheme.colors.background,
-                            elevation = 0.dp,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                ) { its ->
-                    val verticalScrollState = rememberScrollState(0)
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .scrollable(
-                                orientation = Orientation.Vertical,
-                                state = verticalScrollState,
-                                enabled = false
-                            )
-                            .padding(its)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Divider(
-                            color = MaterialTheme.colors.onBackground,
-                            thickness = 0.5.dp,
-                            modifier = Modifier
+                        Text(
+                            text = "مشاهده یا ویرایش",
+                            style = MaterialTheme.typography.h2,
                         )
-
-                        OutlinedTextField(
-                            value = topicValue,
-                            onValueChange = { newTopic ->
-                                topicValue = newTopic
+                        Spacer(modifier = Modifier.weight(1f))
+                        Switch(
+                            checked = checkedEdit,
+                            onCheckedChange = { switch ->
+                                checkedEdit = switch
                             },
-                            isError = topicValue.isEmpty(),
-                            label = { Text(text = stringResource(R.string.note_topic)) },
-                            trailingIcon = {
-                                IconButton(
-                                    onClick = {
-                                        clipboardManager.setText(
-                                            AnnotatedString(note.topic)
-                                        )
-                                        Toast.makeText(
-                                            context,
-                                            "موضوع کپی شد.",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_copy),
-                                        contentDescription = "copy",
-                                        tint = Color.Black,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
-                            },
-                            enabled = checkedEdit,
-                            singleLine = true,
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = MaterialTheme.colors.primaryVariant,
-                                focusedLabelColor = MaterialTheme.colors.primaryVariant,
-                                textColor = MaterialTheme.colors.onBackground
-                            ),
-                            modifier = Modifier
+                            colors = SwitchDefaults.colors(MaterialTheme.colors.primaryVariant)
                         )
-                        OutlinedTextField(
-                            value = descriptionValue,
-                            onValueChange = { newDescription ->
-                                descriptionValue = newDescription
-                            },
-                            label = { Text(text = stringResource(R.string.note_description)) },
-                            trailingIcon = {
-                                IconButton(
-                                    onClick = {
-                                        clipboardManager.setText(
-                                            AnnotatedString(note.description)
-                                        )
-                                        Toast.makeText(
-                                            context,
-                                            "متن کپی شد.",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_copy),
-                                        contentDescription = "copy",
-                                        tint = Color.Black,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
-                            },
-                            enabled = checkedEdit,
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = MaterialTheme.colors.primaryVariant,
-                                focusedLabelColor = MaterialTheme.colors.primaryVariant,
-                                textColor = MaterialTheme.colors.onBackground
-                            ),
-                            modifier = Modifier
+                        val textColor = if (checkedEdit) red else Color.Gray
+                        Text(
+                            text = stringResource(R.string.edit),
+                            style = MaterialTheme.typography.body2,
+                            color = textColor
                         )
                     }
+                    Divider(
+                        color = MaterialTheme.colors.onBackground,
+                        thickness = 0.5.dp,
+                        modifier = Modifier
+                    )
+
+                    OutlinedTextField(
+                        value = topicValue,
+                        onValueChange = { newTopic ->
+                            topicValue = newTopic
+                        },
+                        isError = topicValue.isEmpty(),
+                        label = { Text(text = stringResource(R.string.note_topic)) },
+                        trailingIcon = {
+                            IconButton(
+                                onClick = {
+                                    clipboardManager.setText(
+                                        AnnotatedString(note.topic)
+                                    )
+                                    Toast.makeText(
+                                        context,
+                                        "موضوع کپی شد.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_copy),
+                                    contentDescription = "copy",
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        },
+                        //enabled = checkedEdit,
+                        readOnly = !checkedEdit,
+                        singleLine = true,
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = MaterialTheme.colors.primaryVariant,
+                            focusedLabelColor = MaterialTheme.colors.primaryVariant,
+                            textColor = MaterialTheme.colors.onBackground
+                        ),
+                        modifier = Modifier
+                    )
+                    OutlinedTextField(
+                        value = descriptionValue,
+                        onValueChange = { newDescription ->
+                            descriptionValue = newDescription
+                        },
+                        label = { Text(text = stringResource(R.string.note_description)) },
+                        trailingIcon = {
+                            IconButton(
+                                onClick = {
+                                    clipboardManager.setText(
+                                        AnnotatedString(note.description)
+                                    )
+                                    Toast.makeText(
+                                        context,
+                                        "متن کپی شد.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_copy),
+                                    contentDescription = "copy",
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        },
+                        //enabled = checkedEdit,
+                        readOnly = !checkedEdit,
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = MaterialTheme.colors.primaryVariant,
+                            focusedLabelColor = MaterialTheme.colors.primaryVariant,
+                            textColor = MaterialTheme.colors.onBackground
+                        ),
+                        modifier = Modifier
+                    )
                 }
-            },
-            title = {},
-            backgroundColor = MaterialTheme.colors.background,
-            modifier = Modifier
+            }
         )
     }
 }
 
 @Composable
 fun DeleteNoteDialog(
-    viewModel: NoteScreenViewModel,
+    viewModel: NoteScreenViewModel = hiltViewModel(),
     note: NoteEntity,
     action: (Boolean) -> Unit
 ) {
@@ -344,7 +323,7 @@ fun DeleteNoteDialog(
 @Composable
 fun DeleteAllNotesDialog(
     isDeleteAllDialog: Boolean,
-    viewModel: NoteScreenViewModel,
+    viewModel: NoteScreenViewModel = hiltViewModel(),
     action: (Boolean) -> Unit
 ) {
     var isDeleteAllDialog1 = isDeleteAllDialog

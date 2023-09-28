@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -41,7 +42,7 @@ fun SheetContent(
     bottomSheetState: ModalBottomSheetState,
     scope: CoroutineScope,
     scaffoldState: ScaffoldState,
-    viewModel: NoteScreenViewModel
+    viewModel: NoteScreenViewModel = hiltViewModel()
 ) {
     var topicText by rememberSaveable { mutableStateOf("") }
     var isTopicError by remember { mutableStateOf(false) }
@@ -106,7 +107,6 @@ fun SheetContent(
                             actionLabel = "ذخیره"
                         )
                     }
-
                 }
             },
             shape = MaterialTheme.shapes.small,

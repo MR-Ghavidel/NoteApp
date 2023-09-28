@@ -1,5 +1,6 @@
 package mohammadreza.ghavidel.noteapp.ui.screens.notes
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -52,14 +53,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import mohammadreza.ghavidel.noteapp.R
 
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NotesScreen(
@@ -77,9 +77,7 @@ fun NotesScreen(
         skipHalfExpanded = true
     )
     val lazyGridState = rememberLazyGridState()
-    val isTopState by remember { derivedStateOf { lazyGridState.firstVisibleItemIndex != 0} }
-    val clipboardManager = LocalClipboardManager.current
-    val context = LocalContext.current
+    val isTopState by remember { derivedStateOf { lazyGridState.firstVisibleItemIndex != 0 } }
 
     ModalBottomSheetLayout(
         sheetState = bottomSheetState,
@@ -93,7 +91,6 @@ fun NotesScreen(
                 bottomSheetState = bottomSheetState,
                 scope = scope,
                 scaffoldState = scaffoldState,
-                viewModel = viewModel
             )
         },
         sheetElevation = 5.dp,
@@ -116,8 +113,8 @@ fun NotesScreen(
                     actions = {
                         IconButton(
                             onClick = {
-                            bookmarkFilter = !bookmarkFilter
-                        }
+                                bookmarkFilter = !bookmarkFilter
+                            }
                         ) {
                             val bookmarkIcon = if (bookmarkFilter) {
                                 Icons.Outlined.Favorite
@@ -163,19 +160,33 @@ fun NotesScreen(
                                 )
                             }
                         }
-                        DeleteAllNotesDialog(isDeleteAllDialog, viewModel) { itDialog ->
+                        DeleteAllNotesDialog(isDeleteAllDialog) { itDialog ->
                             isDeleteAllDialog = itDialog
+                        }
+                    },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = {
+                                scope.launch {
+                                    bottomSheetState.show()
+                                }
+                            },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "add new note"
+                            )
                         }
                     },
                     backgroundColor = MaterialTheme.colors.background
                 )
             },
             floatingActionButton = {
-                if (isTopState){
+                if (isTopState) {
                     FloatingActionButton(
                         onClick = {
                             scope.launch {
-                                    lazyGridState.animateScrollToItem(index = 0)
+                                lazyGridState.animateScrollToItem(index = 0)
                             }
                         },
                         backgroundColor = MaterialTheme.colors.primary,
@@ -187,25 +198,10 @@ fun NotesScreen(
                         )
                     }
                 }
-                else
-                FloatingActionButton(
-                    onClick = {
-                        scope.launch {
-                            bottomSheetState.show()
-                        }
-                    },
-                    backgroundColor = MaterialTheme.colors.primary,
-                    contentColor = MaterialTheme.colors.onPrimary
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "add new note"
-                    )
-                }
             },
         ) {
             LazyVerticalGrid(
-                state= lazyGridState,
+                state = lazyGridState,
                 columns = GridCells.Fixed(2),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -273,7 +269,6 @@ fun NotesScreen(
                                 )
                                 if (isDeleteNoteDialog) {
                                     DeleteNoteDialog(
-                                        viewModel = viewModel,
                                         note = note
                                     ) { itDialog ->
                                         isDeleteNoteDialog = itDialog
@@ -292,13 +287,9 @@ fun NotesScreen(
                         }
                     }
                     EditOrShowDialog(
-                        isShowNoteDialog,
-                        note,
-                        viewModel,
-                        scope,
-                        scaffoldState,
-                        clipboardManager,
-                        context
+                        isShowNoteDialog = isShowNoteDialog,
+                        note = note,
+                        scaffoldState = scaffoldState,
                     ) { itEditDialog ->
                         isShowNoteDialog = itEditDialog
                     }
