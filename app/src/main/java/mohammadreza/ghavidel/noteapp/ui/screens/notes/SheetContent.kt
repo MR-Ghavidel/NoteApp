@@ -29,7 +29,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mohammadreza.ghavidel.noteapp.R
@@ -90,7 +89,7 @@ fun SheetContent(
                     isTopicError = true
                     focusManager.clearFocus()
                 } else {
-                    scope.launch(Dispatchers.IO) {
+                    scope.launch {
                         viewModel.insertNote(
                             note = NoteEntity(
                                 topic = topicText,

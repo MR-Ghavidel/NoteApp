@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.DropdownMenu
@@ -33,6 +34,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Favorite
@@ -41,6 +43,7 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,7 +57,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mohammadreza.ghavidel.noteapp.R
 
@@ -74,6 +76,8 @@ fun NotesScreen(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true
     )
+    val lazyGridState = rememberLazyGridState()
+    val isTopState by remember { derivedStateOf { lazyGridState.firstVisibleItemIndex != 0} }
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
 
@@ -110,9 +114,11 @@ fun NotesScreen(
                         )
                     },
                     actions = {
-                        IconButton(onClick = {
+                        IconButton(
+                            onClick = {
                             bookmarkFilter = !bookmarkFilter
-                        }) {
+                        }
+                        ) {
                             val bookmarkIcon = if (bookmarkFilter) {
                                 Icons.Outlined.Favorite
                             } else {
@@ -165,9 +171,26 @@ fun NotesScreen(
                 )
             },
             floatingActionButton = {
+                if (isTopState){
+                    FloatingActionButton(
+                        onClick = {
+                            scope.launch {
+                                    lazyGridState.animateScrollToItem(index = 0)
+                            }
+                        },
+                        backgroundColor = MaterialTheme.colors.primary,
+                        contentColor = MaterialTheme.colors.onPrimary,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowUp,
+                            contentDescription = "scroll to top"
+                        )
+                    }
+                }
+                else
                 FloatingActionButton(
                     onClick = {
-                        scope.launch(Dispatchers.IO) {
+                        scope.launch {
                             bottomSheetState.show()
                         }
                     },
@@ -182,14 +205,15 @@ fun NotesScreen(
             },
         ) {
             LazyVerticalGrid(
-                modifier = Modifier.padding(it),
+                state= lazyGridState,
                 columns = GridCells.Fixed(2),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(
                     vertical = 16.dp,
                     horizontal = 24.dp
-                )
+                ),
+                modifier = Modifier.padding(it)
             ) {
                 items(
                     if (bookmarkFilter) bookmarkNotes else notes

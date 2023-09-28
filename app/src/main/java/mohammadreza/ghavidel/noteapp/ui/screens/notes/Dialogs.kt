@@ -41,7 +41,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mohammadreza.ghavidel.noteapp.R
@@ -84,7 +83,7 @@ fun EditOrShowDialog(
                                 description = descriptionValue,
                                 id = note.id
                             )
-                            scope.launch(Dispatchers.IO) {
+                            scope.launch {
                                 delay(100)
                                 scaffoldState.snackbarHostState.showSnackbar(
                                     message = "ویرایش انجام شد.",
